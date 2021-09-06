@@ -1,0 +1,12 @@
+{
+  "settings": {
+    "index": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0,
+      "mapping.total_fields.limit" : 100,
+      "mapping.nested_fields.limit" : 100,
+			"refresh_interval" : "10s",
+			"max_result_window" : 100000
+    }
+  }
+}

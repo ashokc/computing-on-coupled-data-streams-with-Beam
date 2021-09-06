@@ -1,0 +1,14 @@
+{
+	"namespace": "com.xplordat.kbe.avro",
+	"type":"record",
+  "name":"EstimatedVertex",
+  "fields": [
+  	{ "name": "sensor", "type": "string" },
+    { "name": "X", "type": "double" },
+    { "name": "Y", "type": "double" },
+    { "name": "time", "type": "long" },
+    { "name": "nsamples", "type": "int" },
+    { "name": "compute_time", "type": "long" }
+  ]
+}
+

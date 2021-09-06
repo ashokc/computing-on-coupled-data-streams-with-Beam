@@ -1,0 +1,13 @@
+{
+	"namespace": "com.xplordat.kbe.avro",
+	"type": "record",
+	"name": "RawVertex",
+	"fields": [
+		{ "name": "sensor", "type": "string" },
+		{ "name": "production_time", "type": "long" },
+		{ "name": "X", "type": "double" },
+		{ "name": "Y", "type": "double" },
+		{ "name": "production_order", "type": "long" },
+		{ "name": "arrival_order", "type": "long" }
+	]
+}

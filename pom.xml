@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one or more
+    contributor license agreements.  See the NOTICE file distributed with
+    this work for additional information regarding copyright ownership.
+    The ASF licenses this file to You under the Apache License, Version 2.0
+    (the "License"); you may not use this file except in compliance with
+    the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.xplordat.kbe</groupId>
+  <artifactId>kafka-beam-es</artifactId>
+	<version>1.0-SNAPSHOT</version>
+
+  <packaging>jar</packaging>
+
+  <properties>
+    <beam.version>2.31.0</beam.version>
+    <joda.version>2.10.10</joda.version>
+    <junit.version>4.13.1</junit.version>
+    <libraries-bom.version>20.0.0</libraries-bom.version>
+    <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
+    <maven-exec-plugin.version>1.6.0</maven-exec-plugin.version>
+    <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
+    <maven-shade-plugin.version>3.1.0</maven-shade-plugin.version>
+    <mockito.version>3.7.7</mockito.version>
+    <slf4j.version>1.7.30</slf4j.version>
+    <avro-maven-plugin.version>1.10.2</avro-maven-plugin.version>
+    <kafka-clients.version>2.8.0</kafka-clients.version>
+    <confluent.version>6.2.0</confluent.version>
+    <avro.version>1.10.2</avro.version>
+    <avro-maven-plugin.version>1.10.2</avro-maven-plugin.version>
+    <log4j-core.version>2.14.1</log4j-core.version>
+    <log4j-api.version>2.14.1</log4j-api.version>
+    <log4j-slf4j-impl.version>2.14.1</log4j-slf4j-impl.version>
+  	<ms-sql-server-version>9.2.1.jre8</ms-sql-server-version>
+  	<elasticsearch-version>7.6.2</elasticsearch-version>
+    <commons-math3.version>3.6.1</commons-math3.version>
+  </properties>
+
+  <repositories>
+    <repository>
+      <id>apache.snapshots</id>
+      <name>Apache Development Snapshot Repository</name>
+      <url>https://repository.apache.org/content/repositories/snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+		<repository>
+			<id>central</id>
+      <name>Central Repository</name>
+			<url>https://repo.maven.apache.org/maven2</url>
+  	</repository>
+    <repository>
+    	<id>confluent</id>
+    	<url>https://packages.confluent.io/maven/</url>
+  	</repository>
+
+  </repositories>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.avro</groupId>
+        <artifactId>avro-maven-plugin</artifactId>
+        <version>${avro-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>schema</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${project.basedir}/src/main/avro/</sourceDirectory>
+              <outputDirectory>${project.basedir}/src/main/java/</outputDirectory>
+              <stringType>String</stringType>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Ensure that the Maven jar plugin runs before the Maven
+        shade plugin by listing the plugin higher within the file. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>${maven-jar-plugin.version}</version>
+      </plugin>
+
+      <!--
+        Configures `mvn package` to produce a bundled jar ("fat jar") for runners
+        that require this for job submission to a cluster.
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>${maven-shade-plugin.version}</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <finalName>${project.artifactId}-bundled-${project.version}</finalName>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/LICENSE</exclude>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>${maven-exec-plugin.version}</version>
+          <configuration>
+            <cleanupDaemonThreads>false</cleanupDaemonThreads>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>direct-runner</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <!-- Makes the DirectRunner available when running a pipeline. -->
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.beam</groupId>
+          <artifactId>beam-runners-direct-java</artifactId>
+          <version>${beam.version}</version>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+
+  </profiles>
+
+  <dependencies>
+
+<!-- Ashok added Begin -->
+
+<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
+		<dependency>
+    	<groupId>org.apache.commons</groupId>
+    	<artifactId>commons-math3</artifactId>
+    	<version>${commons-math3.version}</version>
+	</dependency>
+
+<!-- https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc -->
+		<dependency>
+  		<groupId>com.microsoft.sqlserver</groupId>
+  		<artifactId>mssql-jdbc</artifactId>
+  		<version>${ms-sql-server-version}</version>
+		</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.elasticsearch.client/elasticsearch-rest-high-level-client -->
+		<dependency>
+    	<groupId>org.elasticsearch.client</groupId>
+    	<artifactId>elasticsearch-rest-high-level-client</artifactId>
+    	<version>${elasticsearch-version}</version>
+		</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.elasticsearch.client/elasticsearch-rest-client -->
+		<dependency>
+    	<groupId>org.elasticsearch.client</groupId>
+    	<artifactId>elasticsearch-rest-client</artifactId>
+    	<version>${elasticsearch-version}</version>
+		</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
+		<dependency>
+    	<groupId>org.apache.kafka</groupId>
+    	<artifactId>kafka-clients</artifactId>
+      <version>${kafka-clients.version}</version>
+		</dependency>
+
+<!-- https://mvnrepository.com/artifact/io.confluent/kafka-avro-serializer -->
+		<dependency>
+    	<groupId>io.confluent</groupId>
+    	<artifactId>kafka-avro-serializer</artifactId>
+      <version>${confluent.version}</version>
+		</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.apache.avro/avro -->
+		<dependency>
+    	<groupId>org.apache.avro</groupId>
+    	<artifactId>avro</artifactId>
+      <version>${avro.version}</version>
+		</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.apache.avro/avro-maven-plugin -->
+		<dependency>
+    	<groupId>org.apache.avro</groupId>
+    	<artifactId>avro-maven-plugin</artifactId>
+      <version>${avro-maven-plugin.version}</version>
+		</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+		<dependency>
+    	<groupId>org.apache.logging.log4j</groupId>
+    	<artifactId>log4j-core</artifactId>
+      <version>${log4j-core.version}</version>
+		</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
+		<dependency>
+    	<groupId>org.apache.logging.log4j</groupId>
+    	<artifactId>log4j-api</artifactId>
+      <version>${log4j-api.version}</version>
+		</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl -->
+		<dependency>
+    	<groupId>org.apache.logging.log4j</groupId>
+    	<artifactId>log4j-slf4j-impl</artifactId>
+      <version>${log4j-slf4j-impl.version}</version>
+		</dependency>
+
+<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+		<dependency>
+    	<groupId>com.google.guava</groupId>
+    	<artifactId>guava</artifactId>
+    	<version>30.1.1-jre</version>
+		</dependency>
+
+<!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+		<dependency>
+    	<groupId>com.google.code.gson</groupId>
+		  <artifactId>gson</artifactId>
+			<version>2.8.7</version>
+		</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.json/json -->
+		<dependency>
+    	<groupId>org.json</groupId>
+    	<artifactId>json</artifactId>
+    	<version>20210307</version>
+		</dependency>
+
+<!-- Ashok added End -->
+
+<!-- https://mvnrepository.com/artifact/org.apache.beam/beam-sdks-java-io-kafka -->
+		<dependency>
+    	<groupId>org.apache.beam</groupId>
+    	<artifactId>beam-sdks-java-io-kafka</artifactId>
+      <version>${beam.version}</version>
+		</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.apache.beam/beam-sdks-java-io-elasticsearch -->
+		<dependency>
+    	<groupId>org.apache.beam</groupId>
+    	<artifactId>beam-sdks-java-io-elasticsearch</artifactId>
+    	<version>${beam.version}</version>
+		</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.apache.beam/beam-sdks-java-io-jdbc -->
+		<dependency>
+    	<groupId>org.apache.beam</groupId>
+    	<artifactId>beam-sdks-java-io-jdbc</artifactId>
+    	<version>${beam.version}</version>
+		</dependency>
+
+
+
+    <!-- Adds a dependency on the Beam SDK. -->
+    <dependency>
+      <groupId>org.apache.beam</groupId>
+      <artifactId>beam-sdks-java-core</artifactId>
+      <version>${beam.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>${joda.version}</version>
+    </dependency>
+
+    <!-- Add slf4j API frontend binding with JUL backend -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
+      <version>${slf4j.version}</version>
+      <!-- When loaded at runtime this will wire up slf4j to the JUL backend -->
+			<!--
+      <scope>runtime</scope>
+			-->
+    </dependency>
+
+    <!-- Hamcrest and JUnit are required dependencies of PAssert,
+         which is used in the main code of DebuggingWordCount example. -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+    </dependency>
+
+    <!-- The DirectRunner is needed for unit tests. -->
+    <dependency>
+      <groupId>org.apache.beam</groupId>
+      <artifactId>beam-runners-direct-java</artifactId>
+      <version>${beam.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${mockito.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+</project>

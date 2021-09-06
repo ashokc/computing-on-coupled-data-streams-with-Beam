@@ -1,0 +1,18 @@
+{
+	"namespace": "com.xplordat.kbe.avro",
+	"type":"record",
+	"name": "Triangle",
+	"fields":[
+    { "name": "window_start", "type": "long" },
+    { "name": "window_end", "type": "long" },
+    { "name": "window_mid_time", "type": "long" },
+		{ "name": "ab", "type": "double" },
+		{ "name": "bc", "type": "double" },
+		{ "name": "ca", "type": "double" },
+		{ "name": "perimeter", "type": "double" },
+		{ "name": "area", "type": "double" },
+		{ "name": "total_samples_used", "type": "int" },
+		{ "name": "compute_time", "type": "long" }
+	]
+}
+

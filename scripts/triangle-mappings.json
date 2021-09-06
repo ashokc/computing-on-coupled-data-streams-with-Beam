@@ -1,0 +1,14 @@
+{
+			"properties" : {
+        "window_start": { "type": "date", "format" : "epoch_millis" },
+        "window_end": { "type": "date", "format" : "epoch_millis" },
+        "window_mid_time": { "type": "date", "format" : "epoch_millis" },
+        "ab": { "type": "double" },
+        "bc": { "type": "double" },
+        "ca": { "type": "double" },
+        "perimeter": { "type": "double" },
+        "area": { "type": "double" },
+       	"total_samples_used": { "type": "integer" },
+        "compute_time": { "type": "date", "format" : "epoch_millis" }
+			}
+}
