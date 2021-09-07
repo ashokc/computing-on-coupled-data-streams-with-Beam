@@ -37,9 +37,11 @@ The location data streams from the three vertices are processed to identify a tr
 
 #	To use this software
 
-	1. mvn package
-	1. cd scripts
-	2. ./run.sh HH:MM (all three data streams will be scheduled to start up at this time)
+	1. Set up a kafka topic 'raw-vertex' & optionally an elasticsearch index to hold the computed metrics for analysis
+	2. Edit application.properties, produce.sh and provide Elasticsearch connection details as needed
+	3. mvn package
+	4. cd scripts
+	5. ./run.sh HH:MM (all three data streams will be scheduled to start up at this time)
 
 #	Sample analysis
 
