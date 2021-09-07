@@ -21,15 +21,6 @@ function monitor() {
 
 }
 
-#monitor monitor1 all 0 false 1 true feature1,feature2 1000
-
-#monitorName=$1
-#amplitude=$2
-#xReference=$3
-#yReference=$4
-
-#	Args: clientId acks retries enableIdempotence maxInFlightRequestsPerConnection topic amplitude angularV xReference yReference
-
 sensor=$1
 start_time=$2
 
