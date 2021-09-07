@@ -1,3 +1,4 @@
+
 # Computing on Coupled Data Streams with Beam
 Coupled data streams need to be analyzed together ensuring simultaneity of events across the participant streams.
 
@@ -13,9 +14,8 @@ The location data streams from the three vertices are processed to identify a tr
 
 *Figure 1. The vertex points execute a simple harmonic motion around their rest states, along the indicated axis. The monitor at each vertex generates a stream of data for its coordinate position (x,y). These streams are processed together by Beam to compute the perimeter and area of the triangle identified by these three points*
 
-<video width="640" height="640" autoplay loop controls>
-  <source src="images/slow-animated-triangle.mp4" type="video/mp4">
-</video>
+
+https://user-images.githubusercontent.com/6760508/132264448-9c32332e-e068-42ad-b25b-dbcdc74cf7c7.mp4
 
 *Figure 2. Animation of the deforming triangle. The length of the arrows at any time reflects the speed of movement of the vertex at that time*
 
